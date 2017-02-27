@@ -1,3 +1,11 @@
+# Google-Complete-Me を改造してみた
+
+* http.proxy 対応
+  - http.proxy から値をとって、http-proxy-agent を使ってアクセス
+* 日本語の結果を得られるようにしてみた
+  - 結果はフィルタリング済みとなって表示される
+* うまいことできたら PR してみる
+
 # [Google-Complete-Me](https://github.com/jaydenlin/google-complete-me)
 
 > An extension that provides `Google Suggestion API Support` in [Visual Studio Code](https://code.visualstudio.com/)!
