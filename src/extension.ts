@@ -1,5 +1,6 @@
 'use strict';
 import * as vscode from 'vscode';
+import * as HttpsProxyAgent from 'https-proxy-agent';
 var path = require('path');
 var _ = require('lodash');
 var fetch = require('node-fetch');
@@ -59,11 +60,16 @@ class CompleteProvider implements vscode.CompletionItemProvider {
         const lineAt = document.lineAt(position);
         const lineText = document.getText(lineAt.range);
         let userQuery = getUserKeyIn(lineText, position);
-        
+        let httpSettings = vscode.workspace.getConfiguration('http');
+        // console.log('proxy=', vscode.workspace.getConfiguration('http').get('proxy'));
+
         //Case 1. user Query is not empty
         if (userQuery !== '') {
             return new Promise((resolve, reject) => {
-                fetch('http://suggestqueries.google.com/complete/search?output=toolbar&hl=en&q=' + getUserKeyIn(lineText, position))
+                // fetch('http://suggestqueries.google.com/complete/search?output=toolbar&hl=en&q=' + getUserKeyIn(lineText, position))
+                fetch('http://suggestqueries.google.com/complete/search?output=toolbar&ie=utf_8&oe=utf_8&q=' + encodeURI(getUserKeyIn(lineText, position)), {
+                    agent: (httpSettings.get('proxy') !== '') ? new HttpsProxyAgent(`${httpSettings.get('proxy')}`) : ''
+                })
                     .then(function (res) {
                         return res.text();
                     }).then(function (body) {
@@ -82,6 +88,7 @@ class CompleteProvider implements vscode.CompletionItemProvider {
                                     var items = result.toplevel.CompleteSuggestion.map((item) => {
                                         return new vscode.CompletionItem(item.suggestion[0]['$'].data);
                                     });
+                                    console.log(items);
                                     resolve(items);
                                 }
 
